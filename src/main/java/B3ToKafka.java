@@ -1,24 +1,40 @@
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class B3ToKafka {
     public static void main(String[] args) throws Exception {
 
-        Configuration conf = new Configuration();
-        conf.setInteger("rest.port",8884);
+//        Configuration conf = new Configuration();
+//        conf.setInteger("rest.port",8883);
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setRestartStrategy(RestartStrategies.failureRateRestart(
+                3, // 一个时间段内的最大失败次数
+                Time.of(5, TimeUnit.MINUTES), // 衡量失败次数的是时间段
+                Time.of(10, TimeUnit.SECONDS) // 间隔
+        ));
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
 
+        //设置checkpoint
+        env.enableCheckpointing( 2000, CheckpointingMode.EXACTLY_ONCE);  // 传入两个最基本ck参数；间隔时长，ck模式
+        CheckpointConfig checkpointConfig =env.getCheckpointConfig();
+        checkpointConfig.setCheckpointStorage("hdfs://hadoop102:8020/ck");
 
 //        tenv.executeSql("CREATE TABLE stu (\n" +
 //                           "    id INT,\n" +
@@ -47,7 +63,7 @@ public class B3ToKafka {
                     // 生成随机分数
                     int score = random.nextInt(MAX_SCORE + 1); // 生成0到100之间的随机整数
                     // 生成带序号的输出
-                    String output = counter + ", " + score;
+                    String output = counter + "," + score;
                     ctx.collect(output); // 将生成的性别发送到下游
                     counter++; // 序号自增
                     Thread.sleep(1000); // 每秒产生一个新的性别

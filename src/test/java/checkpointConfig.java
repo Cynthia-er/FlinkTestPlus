@@ -1,4 +1,4 @@
-import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
+
 import org.apache.flink.runtime.state.StateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -19,12 +19,12 @@ public class checkpointConfig{
          * FsStateBackend：状态存储在文件系统中，适合较大的状态，但需要额外的存储配置。
          * RocksDBStateBackend：基于 RocksDB 的状态后端，适合超大状态的处理，并支持持久化到本地文件系统或 HDFS。
          */
-        StateBackend stateBackend = new RocksDBStateBackend("hdfs://hadoop102:8020/ckpt");
-        env.setStateBackend(stateBackend);
+//        StateBackend stateBackend = new RocksDBStateBackend("hdfs://hadoop102:8020/ck");
+//        env.setStateBackend(stateBackend);
 
         env.enableCheckpointing( 2000, CheckpointingMode.EXACTLY_ONCE);  // 传入两个最基本ck参数；间隔时长，ck模式
         CheckpointConfig checkpointConfig =env.getCheckpointConfig();
-        checkpointConfig.setCheckpointStorage("hdfs://hadoop102:8020/ckpt");
+        checkpointConfig.setCheckpointStorage("hdfs://hadoop102:8020/ck");
         checkpointConfig.setAlignedCheckpointTimeout(Duration.ofMinutes(10000)); // 设置ck对齐的超时时长
         checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE); // 设置ck算法模式
         checkpointConfig.setCheckpointInterval(2000); // ck的间隔时长

@@ -2,8 +2,10 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
@@ -14,6 +16,11 @@ public class kfkB2ToMysql {
 //        Configuration conf = new Configuration();
 //        conf.setInteger("rest.port",8081);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        //设置checkpoint
+        env.enableCheckpointing( 2000, CheckpointingMode.EXACTLY_ONCE);  // 传入两个最基本ck参数；间隔时长，ck模式
+        CheckpointConfig checkpointConfig =env.getCheckpointConfig();
+        checkpointConfig.setCheckpointStorage("hdfs://hadoop102:8020/ck");
 
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
 
@@ -46,8 +53,9 @@ public class kfkB2ToMysql {
         //建表来映射mysql中的flinkTest.table
         tenv.executeSql("create table t_mysql                             "
                 +                     "(                                      "
-                +                     "   id int primary key,                 "
-                +                     "   name string                       "
+                +                     "   id int,                 "
+                +                     "   name string,                       "
+                +                     " PRIMARY KEY (id) NOT ENFORCED"
                 +                     ")                                      "
                 + "with (                                                     "
                 + "      'connector' = 'jdbc',                                "

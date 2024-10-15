@@ -3,64 +3,77 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.example</groupId>
     <artifactId>FlinkProject</artifactId>
     <version>1.0-SNAPSHOT</version>
-
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-java</artifactId>
+<!--            <version>1.14.4</version>-->
             <version>1.18.1</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-streaming-java -->
         <dependency>
             <groupId>org.apache.flink</groupId>
+<!--            <artifactId>flink-streaming-java_2.12</artifactId>-->
+<!--            <version>1.14.4</version>-->
             <artifactId>flink-streaming-java</artifactId>
             <version>1.18.1</version>
-            <scope>provided</scope>
         </dependency>
-
-
         <!--flinksql-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-api-scala-bridge_2.12</artifactId>
+<!--            <version>1.14.4</version>-->
             <version>1.18.1</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-sql-client -->
+        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-table-planner -->
         <dependency>
             <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_2.12</artifactId>
+            <version>1.18.1</version>
+        </dependency>
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.flink/flink-table-runtime &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-table-runtime</artifactId>-->
+<!--            <version>1.18.1</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.flink/flink-table-common &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-table-common</artifactId>-->
+<!--            <version>1.18.1</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+<!--            <artifactId>flink-sql-client_2.12</artifactId>-->
+<!--            <version>1.14.4</version>-->
             <artifactId>flink-sql-client</artifactId>
             <version>1.18.1</version>
-            <scope>provided</scope>
         </dependency>
-
-
         <!--flinksql 解析 json数据-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-json</artifactId>
+<!--            <version>1.14.4</version>-->
             <version>1.18.1</version>
         </dependency>
-
         <!--flinksql 解析 csv数据-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-csv</artifactId>
+<!--            <version>1.14.4</version>-->
             <version>1.18.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
@@ -74,6 +87,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-scala_2.12</artifactId>
+<!--            <version>1.14.4</version>-->
             <version>1.18.1</version>
         </dependency>
         <dependency>
@@ -81,52 +95,51 @@
             <artifactId>flink-streaming-scala_2.12</artifactId>
             <version>1.18.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-clients -->
         <dependency>
             <groupId>org.apache.flink</groupId>
+<!--            <artifactId>flink-clients_2.12</artifactId>-->
+<!--            <version>1.14.4</version>-->
             <artifactId>flink-clients</artifactId>
             <version>1.18.1</version>
         </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-runtime-web -->
         <dependency>
             <groupId>org.apache.flink</groupId>
+<!--            <artifactId>flink-runtime-web_2.12</artifactId>-->
+<!--            <version>1.14.4</version>-->
             <artifactId>flink-runtime-web</artifactId>
             <version>1.18.1</version>
         </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-connector-kafka -->
         <dependency>
             <groupId>org.apache.flink</groupId>
+<!--            <artifactId>flink-connector-kafka_2.12</artifactId>-->
+<!--            <version>1.14.4</version>-->
             <artifactId>flink-connector-kafka</artifactId>
-            <version>3.0.0-1.17</version>
+            <version>1.17.2</version>
         </dependency>
-
-
-
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--&lt;!&ndash;            <artifactId>flink-connector-jdbc_2.12</artifactId>&ndash;&gt;-->
+<!--&lt;!&ndash;            <version>1.14.4</version>&ndash;&gt;-->
+<!--            <artifactId>flink-connector-jdbc</artifactId>-->
+<!--            <version>1.16.3</version>-->
+<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-connector-jdbc -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc</artifactId>
-            <version>3.0.0-1.16</version>
-            <scope>test</scope>
+            <version>3.2.0-1.19</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-mysql-cdc</artifactId>
             <version>3.2.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.75</version>
         </dependency>
-
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
@@ -137,25 +150,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.34</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.34</version>
-            <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-statebackend-rocksdb -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-statebackend-rocksdb</artifactId>
-            <version>1.18.1</version>
-            <scope>test</scope>
-        </dependency>
-
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -179,5 +180,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

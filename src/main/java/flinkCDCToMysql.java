@@ -1,4 +1,8 @@
 import org.apache.flink.cdc.connectors.mysql.source.MySqlSource;
+import org.apache.flink.cdc.connectors.mysql.table.StartupOptions;
+import org.apache.flink.cdc.debezium.JsonDebeziumDeserializationSchema;
+import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
@@ -7,19 +11,27 @@ public class flinkCDCToMysql {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
+        //设置checkpoint
+        env.enableCheckpointing( 2000, CheckpointingMode.EXACTLY_ONCE);  // 传入两个最基本ck参数；间隔时长，ck模式
+        CheckpointConfig checkpointConfig =env.getCheckpointConfig();
+        checkpointConfig.setCheckpointStorage("hdfs://hadoop102:8020/ck");
 
-        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                .hostname("hadoop102")
-                        .port(3306)
-                                .username("root")
-                                        .password("123456")
-                                                .databaseList("flinkTest")
-                                                        .tableList("test.t1")
-                                                                .build();
+//        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
+//                .hostname("hadoop102")
+//                .port(3306)
+//                .username("root")
+//                .password("123456")
+//                .databaseList("flinkTest")
+//                .tableList("flinkTest.t1")
+//                .startupOptions(StartupOptions.initial())
+//                .deserializer(new JsonDebeziumDeserializationSchema())
+//                .build();
+
         //用cdc连接器实时获取到MySQL中变更的数据
         tenv.executeSql("CREATE TABLE t1 ("
-                        +                     "   id int primary key,                 "
-                        +                     "   gender string                       "+
+                        +                     "   id int,                 "
+                        +                     "   gender string ,                       "
+                        +  "       primary key(id) not enforced                       "+
                 ") WITH (" +
                 "'connector' = 'mysql-cdc'," +
                 "'hostname' = 'hadoop102'," +
@@ -30,8 +42,8 @@ public class flinkCDCToMysql {
                 "'table-name' = 't1'" +
                 ")");
 
-        tenv.executeSql("select * from t1").print();
-        tenv.executeSql("CREATE TABLE tt2 (\n"
+//        tenv.executeSql("select * from t1").print();
+        tenv.executeSql("CREATE TABLE t2 (\n"
                 +                     "   id int,                 "
                 +                     "   name string,                        "
                 +                     "   PRIMARY KEY(id) NOT ENFORCED                        "+
@@ -45,10 +57,11 @@ public class flinkCDCToMysql {
                 "'username' = 'root'\n" +
                 ")");
 
-                tenv.executeSql("select * from tt2").print();
+//                tenv.executeSql("select * from t2").print();
         tenv.executeSql("CREATE TABLE t3 (\n"
-                +                     "   id int primary key,                 "
-                +                     "   score int                       "+
+                +                     "   id int,                 "
+                +                     "   score int  ,                       "
+                +  "       primary key(id) not enforced                       "+
                 ") WITH (\n" +
                 "'connector' = 'mysql-cdc',\n" +
                 "'hostname' = 'hadoop102',\n" +
@@ -62,11 +75,12 @@ public class flinkCDCToMysql {
         //对获取到的数据进行处理，写回到MySQL中
         tenv.executeSql("create table t_mysql                             "
                 +                     "(                                      "
-                +                     "   id int primary key,                 "
+                +                     "   id int,                 "
                 +                     "   name string,                        "
                 +                     "   gender string,                       "
                 +                     "   score int,                       "
-                +                     "   rn bigint                       "
+                +                     "   rn bigint,                       "
+                +                     " PRIMARY KEY (id) NOT ENFORCED"
                 +                     ")                                      "
                 + "with (                                                     "
                 + "      'connector' = 'jdbc',                                "
@@ -81,9 +95,9 @@ public class flinkCDCToMysql {
         tenv.executeSql("insert into t_mysql " +
                 "select * from\n" +
                 "             (select t1.id,name,gender,score,row_number() over (partition by gender order by score desc) rn\n" +
-                "              from t1 inner join t2 on t1.id=t2.id\n" +
-                "                      inner join t3 on t2.id=t3.id) as t\n" +
-                "where rn<=3");
+                "              from t1 join t2 on t1.id=t2.id\n" +
+                "                      join t3 on t1.id=t3.id)t\n" +
+                "where rn<=2\n");
 
         env.execute();
     }
